@@ -241,6 +241,8 @@ class Http
         Log::debug('Client Request:', compact('url', 'method', 'options'));
 
         $options['handler'] = $this->getHandler();
+        //不验证CA证书
+        $options['verify'] = false;
 
         $response = $this->getClient()->request($method, $url, $options);
 

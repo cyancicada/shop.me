@@ -11,10 +11,13 @@
 
 namespace think\captcha;
 
+use think\Config;
+
 class CaptchaController
 {
-    public function index(Captcha $captcha, $config = null)
+    public function index($id = "")
     {
-        return $captcha->create($config);
+        $captcha = new Captcha((array)Config::get('captcha'));
+        return $captcha->entry($id);
     }
 }

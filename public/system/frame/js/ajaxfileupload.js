@@ -202,7 +202,6 @@ jQuery.extend({
             // console.log(data);
             // data = jQuery.parseJSON(jQuery(data).text());
             data = JSON.parse(data);
-            console.log(jQuery);
 		}
         if ( type == "html" )
             jQuery("<div>").html(data).evalScripts();

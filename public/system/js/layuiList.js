@@ -4,27 +4,21 @@
         laydate: null,
         layer: null,
         form: null,
-        upload:null,
         tableIns: null,
         laypage:null,
-        layedit:null,
         element:null,
-        tree:null,
         elemOdj:[],
         boxids:'ids',
         odj:'',
         initialize: function () {
             var that = this;
-            layui.use(['form','table', 'laydate', 'layer', 'laypage','element','layedit','tree','upload'], function () {
+            layui.use(['form','table', 'laydate', 'layer', 'laypage','element'], function () {
                 that.form = layui.form;
                 that.table = layui.table;
                 that.laydate = layui.laydate;
                 that.layer = layui.layer;
                 that.laypage =layui.laypage;
                 that.element = layui.element;
-                that.layedit=layui.layedit;
-                that.tree=layui.tree;
-                that.upload=layui.upload;
             })
             $('.layui-input-block').each(function () {
                 var name = $(this).data('type');
@@ -53,11 +47,10 @@
         }
     };
     //ajax POST
-    layList.basePost = function (url, data, successCallback, errorCallback,headers) {
+    layList.basePost = function (url, data, successCallback, errorCallback) {
         var that = this;
-        if(headers==undefined) headers=this.headers();
         $.ajax({
-            headers: headers,
+            headers: this.headers(),
             url: url,
             data: data,
             type: 'post',
@@ -70,16 +63,15 @@
             },
             error: function (err) {
                 errorCallback && errorCallback(err);
-                that.msg('服务器异常');
+                that.msg(err);
             }
         })
     }
     //ajax GET
-    layList.baseGet = function (url,successCallback, errorCallback,headers) {
+    layList.baseGet = function (url,successCallback, errorCallback) {
         var that = this;
-        if(headers==undefined) headers=this.headers();
         $.ajax({
-            headers: headers,
+            headers: this.headers(),
             url: url,
             type: 'get',
             dataType: 'json',
@@ -104,7 +96,7 @@
     };
     //初始化 layui table
     layList.tableList = function (odj, url, data, limit, size,boxids,is_tables) {
-        var limit = limit || 20, size = size || 'sm', $data = [], that = this,boxids=boxids || this.boxids;
+        var limit = limit || 20, size = size || 'lg', $data = [], that = this,boxids=boxids || this.boxids;
         switch (typeof data) {
             case 'object':
                 $data = data;
@@ -116,12 +108,14 @@
         if(is_tables!=true) this.odj=odj;
         if(that.elemOdj[odj]==undefined) that.elemOdj[odj]=odj;
         var elemOdj=that.elemOdj[this.odj];
+        console.log(that.elemOdj);
         that.tableIns = that.table.render({
             id:boxids,
             elem: '#' +elemOdj,
             url: url,
             page: true,
             limit: limit,
+            size: size,
             cols: [$data]
         });
         return that.tableIns;
@@ -139,7 +133,7 @@
 
         return '/' + m + '/' + c + '/' + a + (params == '' ? '' : '/' + params) + (gets == '' ? '' : '?' + gets);
     };
-    layList.U = function(obj){
+    layList.U=function(obj){
         return this.Url(obj);
     }
     //表单重构 where 搜索条件 join,page 是否返回到第一页,tableIns 多table时 this.tableList 返回的参数
@@ -150,6 +144,7 @@
         if(typeof tableIns=='Object'){
             tableIns.reload(whereOdJ);
         }else{
+            console.log(whereOdJ);
             this.tableIns.reload(whereOdJ);
         }
     }
@@ -168,11 +163,13 @@
         }
     }
     //监听列表
-    layList.tool = function (EventFn, fieldStr,odj) {
+    layList.tool = function (EventFn, fieldStr,odjs) {
         var that = this;
         // var elemOdj=elemOdj || that.elemOdj
-        var elemOdj=that.elemOdj[odj || this.odj];
+        var elemOdj=that.elemOdj[odjs || this.odj];
+        console.log(elemOdj);
         this.table.on('tool(' + elemOdj + ')', function (obj) {
+            console.log(obj)
             var data = obj.data, layEvent = obj.event;
             if (typeof EventFn == 'function') {
                 EventFn(layEvent, data,obj);
@@ -224,11 +221,13 @@
             }
         });
     }
-    layList.msg = function (msg,fun) {
+    layList.msg = function (msg) {
         var msg = msg || '未知错误';
         try {
-            return this.layer.msg(msg,fun);
-        } catch (e) {}
+            return this.layer.msg(msg);
+        } catch (e) {
+            console.log(e);
+        }
     }
     //时间选择器
     layList.date = function (IdName) {
@@ -279,17 +278,13 @@
             var value = obj.value //得到修改后的值
                 ,data = obj.data //得到所在行所有键值
                 ,field = obj.field; //得到字段
-            if (typeof name == "function") {
-                name && name(obj);
-            }else{
-                switch (field){
-                    case name:
-                        successFn && successFn(obj);
-                        break;
-                    default:
-                        console.log('未检测到指定字段'+name);
-                        break;
-                }
+            switch (field){
+                case name:
+                    successFn && successFn(obj);
+                    break;
+                default:
+                    console.log('未检测到指定字段'+name);
+                    break;
             }
         });
     }

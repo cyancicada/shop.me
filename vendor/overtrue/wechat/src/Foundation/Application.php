@@ -106,7 +106,6 @@ class Application extends Container
         ServiceProviders\OpenPlatformServiceProvider::class,
         ServiceProviders\MiniProgramServiceProvider::class,
         ServiceProviders\CommentServiceProvider::class,
-        \crmeb\utils\ProgramProvider::class,
     ];
 
     /**
@@ -121,6 +120,10 @@ class Application extends Container
         $this['config'] = function () use ($config) {
             return new Config($config);
         };
+
+        if ($this['config']['debug']) {
+            error_reporting(E_ALL);
+        }
 
         $this->registerProviders();
         $this->registerBase();

@@ -1,6 +1,4 @@
 <?php
-
-define('PHP_EDITION','7.1.0');
 if(function_exists('saeAutoLoader')){
 	define('IS_CLOUD',true);
 	define('IS_SAE',true);
